@@ -10,6 +10,7 @@
   "dependencies": {
     "@react-native-community/async-storage": "^1.10.1",
     "@tensorflow-models/blazeface": "0.0.5",
+    "@tensorflow-models/mobilenet": "^2.0.4",
     "@tensorflow-models/posenet": "^2.2.1",
     "@tensorflow/tfjs": "^1.7.4",
     "@tensorflow/tfjs-react-native": "^0.2.3",

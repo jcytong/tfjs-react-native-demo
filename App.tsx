@@ -4,11 +4,12 @@ import { Button, SafeAreaView, StyleSheet, View, Text, StatusBar } from 'react-n
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
-//import { Diagnostic } from './components/diagnostic';
-//import { MobilenetDemo } from './components/mobilenet_demo';
-//import { TestRunner } from './components/tfjs_unit_test_runner';
-//import { WebcamDemo } from './components/webcam/webcam_demo';
+import { Diagnostic } from './components/diagnostic';
+import { MobilenetDemo } from './components/mobilenet_demo';
+import { TestRunner } from './components/tfjs_unit_test_runner';
+import { WebcamDemo } from './components/webcam/webcam_demo';
 import { RealtimeDemo } from './components/webcam/realtime_demo';
+import { DeepLabDemo } from './components/deeplab_demo';
 
 const BACKEND_TO_USE = 'rn-webgl';
 export type Screen = 'main' | 'diag' | 'demo' | 'deeplab' | 'test' | 'webcam' | 'realtime';
@@ -25,7 +26,13 @@ export default class App extends React.Component {
       isTfReady: false,
       currentScreen: 'main'
     };
-
+    
+    this.showDiagnosticScreen = this.showDiagnosticScreen.bind(this);
+    this.showDemoScreen = this.showDemoScreen.bind(this);
+    this.showDeepLabScreen = this.showDeepLabScreen.bind(this);
+    this.showMainScreen = this.showMainScreen.bind(this);
+    this.showTestScreen = this.showTestScreen.bind(this);
+    this.showWebcamDemo= this.showWebcamDemo.bind(this);
     this.showRealtimeDemo= this.showRealtimeDemo.bind(this);
   }
 
@@ -41,8 +48,62 @@ export default class App extends React.Component {
     });
   }
 
+  showDiagnosticScreen() {
+    this.setState({ currentScreen: 'diag' });
+  }
+
+  showDemoScreen() {
+    this.setState({ currentScreen: 'demo' });
+  }
+
+  showDeepLabScreen() {
+    this.setState({ currentScreen: 'deeplab' });
+  }
+
+  showMainScreen() {
+    this.setState({ currentScreen: 'main' });
+  }
+
+  showTestScreen() {
+    this.setState({ currentScreen: 'test' });
+  }
+
+  showWebcamDemo() {
+    this.setState({ currentScreen: 'webcam' });
+  }
+
   showRealtimeDemo() {
     this.setState({ currentScreen: 'realtime' });
+  }
+
+  renderDeepLabScreen() {
+    const image = require('./assets/images/catsmall.jpg');
+    return <Fragment>
+      <DeepLabDemo
+        image={image}
+        returnToMain={this.showMainScreen} />
+    </Fragment>;
+  }
+
+  renderDemoScreen() {
+    const image = require('./assets/images/catsmall.jpg');
+    return <Fragment>
+      <MobilenetDemo
+        image={image}
+        returnToMain={this.showMainScreen} />
+    </Fragment>;
+  }
+
+  renderTestScreen() {
+    return <Fragment>
+      <TestRunner backend={BACKEND_TO_USE} />
+    </Fragment>;
+  }
+
+  renderWebcamDemo() {
+    return <Fragment>
+      <WebcamDemo returnToMain={this.showMainScreen}/>
+    </Fragment>;
   }
 
   renderMainScreen() {
@@ -52,6 +113,13 @@ export default class App extends React.Component {
         <Button
           onPress={this.showDiagnosticScreen}
           title='Show Diagnostic Screen'
+        />
+      </View>
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>DeepLab</Text>
+        <Button
+          onPress={this.showDeepLabScreen}
+          title='Show DeepLab Screen'
         />
       </View>
       <View style={styles.sectionContainer}>
@@ -109,6 +177,8 @@ export default class App extends React.Component {
           return this.renderMainScreen();
         case 'diag':
           return this.renderDiagnosticScreen();
+        case 'deeplab':
+          return this.renderDeepLabScreen();
         case 'demo':
           return this.renderDemoScreen();
         case 'test':
