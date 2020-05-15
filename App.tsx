@@ -4,7 +4,6 @@ import { Button, SafeAreaView, StyleSheet, View, Text, StatusBar } from 'react-n
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
-import { Diagnostic } from './components/diagnostic';
 import { MobilenetDemo } from './components/mobilenet_demo';
 import { TestRunner } from './components/tfjs_unit_test_runner';
 import { WebcamDemo } from './components/webcam/webcam_demo';
@@ -19,15 +18,14 @@ interface AppState {
   currentScreen: Screen;
 }
 
-export default class App extends React.Component {
-  constructor(props) {
+export default class App extends React.Component<any,AppState> {
+  constructor(props: any) {
     super(props);
     this.state = {
       isTfReady: false,
       currentScreen: 'main'
     };
     
-    this.showDiagnosticScreen = this.showDiagnosticScreen.bind(this);
     this.showDemoScreen = this.showDemoScreen.bind(this);
     this.showDeepLabScreen = this.showDeepLabScreen.bind(this);
     this.showMainScreen = this.showMainScreen.bind(this);
@@ -175,8 +173,6 @@ export default class App extends React.Component {
       switch (currentScreen) {
         case 'main':
           return this.renderMainScreen();
-        case 'diag':
-          return this.renderDiagnosticScreen();
         case 'deeplab':
           return this.renderDeepLabScreen();
         case 'demo':
