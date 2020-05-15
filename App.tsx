@@ -11,6 +11,12 @@ import '@tensorflow/tfjs-react-native';
 import { RealtimeDemo } from './components/webcam/realtime_demo';
 
 const BACKEND_TO_USE = 'rn-webgl';
+export type Screen = 'main' | 'diag' | 'demo' | 'deeplab' | 'test' | 'webcam' | 'realtime';
+
+interface AppState {
+  isTfReady: boolean;
+  currentScreen: Screen;
+}
 
 export default class App extends React.Component {
   constructor(props) {
