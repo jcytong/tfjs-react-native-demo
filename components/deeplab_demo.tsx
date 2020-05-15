@@ -20,7 +20,7 @@ import { Button, SafeAreaView, StyleSheet, ScrollView, View, StatusBar, Image, T
 
 import * as tf from '@tensorflow/tfjs';
 import { fetch } from '@tensorflow/tfjs-react-native';
-import * as mobilenet from '@tensorflow-models/mobilenet';
+import * as deeplab from '@tensorflow-models/deeplab';
 import * as jpeg from 'jpeg-js';
 
 import { Run } from './run';
@@ -49,33 +49,44 @@ export class DeepLabDemo extends React.Component<
     };
   }
 
-  async componentDidMount() {
-    // Load mobilenet
-    const model = await mobilenet.load();
+  async loadModel() {
+    const modelName = 'pascal';   // set to your preferred model, either `pascal`, `cityscapes` or `ade20k`
+    const quantizationBytes = 4;  // either 1, 2 or 4
+    return await deeplab.load({base: modelName, quantizationBytes});
+  }
 
-    //warmup mobilenet
-    await model.classify(tf.zeros([1, 224, 224, 3]));
+  async componentDidMount() {
+    // Load DeepLab
+    const model = await this.loadModel();
+    console.log('DeepLab loaded')
+    console.log(2)
+    //warmup DeepLab
+    await model.segment(tf.zeros([1, 224, 224, 3]));
 
     // Read the image into a tensor
     const imageAssetPath = Image.resolveAssetSource(this.props.image);
     const response = await fetch(imageAssetPath.uri, {}, { isBinary: true });
     const rawImageData = await response.arrayBuffer();
     const imageTensor = this.imageToTensor(rawImageData);
-
+    console.log(imageTensor);
     // Compute a checksum for the image. Useful for debugging.
     const imageTensorSum = imageTensor.sum();
     const imageChecksum = (await imageTensorSum.data())[0];
 
     // Classify the image.
     const start = Date.now();
-    const prediction = await model.classify(imageTensor);
+    // const prediction = await model.classify(imageTensor);
+    const prediction = "123";
+
+    console.log('Running inference...');
+    const { legend, height, width, segmentationMap } = await model.segment(imageTensor);
     const result = this.props.image; // TODO: do some segmentation here
     const end = Date.now();
 
     this.setState({
-      prediction,
+      // prediction,
       predictionTime: end - start,
-      imageChecksum,
+      // imageChecksum,
       result
     });
     tf.dispose([imageTensor, imageTensorSum]);
@@ -84,7 +95,7 @@ export class DeepLabDemo extends React.Component<
   imageToTensor(rawImageData: ArrayBuffer): tf.Tensor3D {
     const TO_UINT8ARRAY = true;
     const { width, height, data } = jpeg.decode(rawImageData, TO_UINT8ARRAY);
-    // Drop the alpha channel info for mobilenet
+    // Drop the alpha channel info
     const buffer = new Uint8Array(width * height * 3);
     let offset = 0; // offset into original data
     for (let i = 0; i < buffer.length; i += 3) {
@@ -95,7 +106,10 @@ export class DeepLabDemo extends React.Component<
       offset += 4;
     }
 
-    return tf.tensor3d(buffer, [height, width, 3]);
+    let tensor = tf.tensor3d(buffer, [height, width, 3]);
+    // https://stackoverflow.com/questions/61318836/segment-image-with-deeplab-model-tensor-flow-react-native
+    // tensor = tf.cast(tensor, 'float32');
+    return tensor;
   }
 
   renderPrediction() {
