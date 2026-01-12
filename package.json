@@ -16,7 +16,7 @@
     "@tensorflow-models/posenet": "^2.2.1",
     "@tensorflow/tfjs": "^1.7.4",
     "@tensorflow/tfjs-react-native": "^0.2.3",
-    "expo": "~37.0.3",
+    "expo": "~48.0.0",
     "expo-asset": "~8.1.5",
     "expo-camera": "~8.2.0",
     "expo-gl": "~8.1.0",
